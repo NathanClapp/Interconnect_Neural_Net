@@ -1,15 +1,14 @@
 # Echo server program
 import socket
 
-HOST = '192.168.1.140'                 # Symbolic name meaning all available interfaces
-PORT = 50007              # Arbitrary non-privileged port
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.bind((HOST, PORT))
-    s.listen(1)
-    conn, addr = s.accept()
-    with conn:
-        print('Connected by', addr)
-        while True:
-            data = conn.recv(1024)
-            if not data: break
-            conn.sendall(data)
+host = ''                 # Symbolic name meaning all available interfaces
+port = 50007              # Arbitrary non-privileged port
+
+socket_object = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+socket_object.bind((host, port))
+print("port " + str(port) + " bound")
+
+while 1:
+    data, addr = socket_object.recvfrom(1024)
+    print(data)

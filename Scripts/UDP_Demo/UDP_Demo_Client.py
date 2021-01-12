@@ -1,10 +1,27 @@
 # Echo client program
-import socket
+import socket	#for sockets
+import sys	#for exit
 
-HOST = '192.168.1.140'    # The remote host
-PORT = 50007              # The same port as used by the server
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.connect((HOST, PORT))
-    s.sendall(b'Hello, world')
-    data = s.recv(1024)
-print('Received', repr(data))
+# create dgram udp socket
+try:
+	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+except socket.error:
+	print('Failed to create socket')
+	sys.exit()
+
+host = 'localhost';
+port = 50007;
+
+while(1):
+	msg = str.encode(input('Enter message to send : '))
+	
+	if msg:
+
+	#Set the whole string
+		s.sendto(msg, (host, port))
+
+	else:
+		continue
+
+	#reply = d[0]
+	#addr = d[1]

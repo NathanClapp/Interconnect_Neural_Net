@@ -22,6 +22,3 @@ while(1):
 
 	else:
 		continue
-
-	#reply = d[0]
-	#addr = d[1]

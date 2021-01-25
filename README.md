@@ -24,4 +24,7 @@ The current plan is to embed layers with the lowest-level language structures re
 # Do List
 - Build Docker containers
 - Make Tensorflow graph
-- Make sample data (Random binary inputs -> composition of logic gates)
+- Make sample data (All combinations of binary inputs -> composition of logic gates)
+
+# Later
+- Replace all UDP client and docker-side stuff with Go (after proof of concept stuff works)

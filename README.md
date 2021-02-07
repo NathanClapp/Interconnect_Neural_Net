@@ -18,7 +18,7 @@ Given some input data set, e.g. a dataset of binary strings, initialize a feedfo
   - Apply activation function.
 
 #### Testing
-Test ability of the network to interconnect arbitrarily complex modules (e.g. pack two complex and interdependent circuit graphs into separate containers, along with all operators that were initially needed to form them, then see if the new graph figured out that it was best to interconnect them). If successful, this will form a basis for a module inheritance process.
+Test ability of the network to interconnect arbitrarily complex modules (e.g. pack two complex and interdependent circuit graphs into separate containers, along with all operators that were initially needed to form them, then see if the new graph figured out that it was best to interconnect the complex modules and not their basic components). If successful, this will form a basis for a module inheritance process.
 
 ### Notes
 - tf.Lambda doesn't appear to work in a neural net when functions contain steps up or down in dimension. Unsuitable for complex operations requiring I/O asymmmetry.
@@ -35,7 +35,7 @@ Test ability of the network to interconnect arbitrarily complex modules (e.g. pa
 - Find suitable activation(s)
 - Generate sample data (All combinations of binary inputs -> composition of logic gates)
 
-### Large/Slow Checkpoints
+##### Large/Slow Checkpoints
 - Replace all UDP server and container-side stuff with faster Go implementations (after proof of concept stuff works)
  - Look into replacing Python UDP client (layer-side) with Go version. Import as a module? Is this needed at all?
 - Define standards or guidelines for:

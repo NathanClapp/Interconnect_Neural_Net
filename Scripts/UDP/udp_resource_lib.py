@@ -6,12 +6,6 @@ from inspect import signature, getmembers
 
 #get this path automatically later
 operator_root_dir = '/home/nathan/Documents/Code/Interconnect_Neural_Net/Scripts/Layer_Programs/Operators'
-#json_module_dir = 
-
-#
-def py_modules(module_name_string):
-    modules_list = []
-    modules_list.append(sys.modules[module_name])
 
 #import files in the given directory as modules
 #return list of modules
@@ -29,69 +23,102 @@ def py_modules_from_directory(operator_dir):
             modules_list.append(sys.modules[module_name])
     return modules_list
 
-operator_modules = py_modules_from_directory(operator_dir=operator_root_dir)
-print(operator_modules)
-
-#workspot
-#def module_object_to_string(module_name):
-
-def nested_data_template(module_name_string, function, function_argc):
-    return [ module_name_string, [function,  function_argc] ]
-
-print(nested_data_template(operator_modules[0], 'testfuncstr', 5))
-print(dir(operator_modules[0]))
-
 #get every function and the number of inputs for each, for all modules in modules list
 #return a structured json array of module_name(function_name(input_count))
 #ignore builtin methods by default
 def py_functions_from_modules(modules_list, ignore_substring='__'):
     function_cumulative_argc = 0
-    function_argc_dict = {}
+    functionc = 0
+    function_argc_list = []
     #open json and prepare for writing
-    for module_name in modules_list:
-        for function in dir(module_name):
+    for module_object in modules_list:
+        for function in dir(module_object):
             #ignore functions beginning or ending in '__', such as __init__
             if not (function.startswith(ignore_substring) or function.endswith(ignore_substring)):
                 #find number of parameters each function takes
-                function_argc = len(signature(getattr(module_name, function)).parameters)
-                #total parameter count
+                function_argc = len(signature(getattr(module_object, function)).parameters)
+
+                #parameter and function counts
                 function_cumulative_argc += function_argc
-                function_argc_dict.update({function : function_argc})
-    return [function_argc_dict, function_cumulative_argc]
+                functionc += 1
 
-print(py_functions_from_modules(operator_modules))
+                function_argc_list.append([module_object.__name__, function, function_argc])
 
+            #list of lists: each sub-array is formatted as:
+            #[module_name, function_name, function_input_count]
+    return [function_argc_list,
+            #number of functions
+            functionc,
+            #sum of inputs for all functions all modules in the modules_list
+            function_cumulative_argc]
 
+def write_module_list(module_array, filename='module_list.txt'):
+    with open(filename, 'w') as file:
+        json.dump(module_array, file)
+
+def read_module_list(filename='module_list.txt'):
+    with open(filename, 'r') as file:
+        return json.load(file)
 
 #returns python list of ints
 def parse_tensor(decoded_tensor):
     #remove brackets and convert to list
     return [int(i) for i in decoded_tensor.replace('[','').replace(']','').split()]
 
-#print(parse_tensor('[1 2 1 4]'))
-
+#for arbitrary language implementation
+# {
 #make as many named pipes as there are array elements (+1 default pipe on startup for exporting pipe count)
-#send data to pipe
+#send data to dynamically created pipes
 #use mkfifo
 #subprocess.run()
 
-#known arg count for boolean py module
-arg_count = 14
-inputs_functions = [()]
 
-def run_general_modules(arg_count, list_tensor):
+#def run_general_modules(arg_count, list_tensor):
     #make 1 process for each function/file in the module directory
-    #for i in 
-
 
     #in each process, pipe data to a unique function, concatenate output, and return
     #subprocess.run('/')
     #else:
         #return 
-    return pipe_ids
+#    return output_list
+# }
+
+#take a list of lists such as: [module_name, function_name, function_input_count]
+#mark off decoded tensor values as function inputs are filled (keep 1-1 map)
+#run as many parallel processes as there are functions
+def write_runner_files(modules_list, filename='parallel_runfile{}.py'):
+    #may be better to just run multiple udp servers after parsing tensor client-side
+    if modules_list[2] == len(decoded_tensor):
+        for i in range(len(modules_list[1])):
+            with open(filename.format(i)) as file:
+                file.write('import os\n')
+                file.write('')
 
 
 
-#def collect_data
 
-#print(boolean_py.and_bool(1,1))
+#    return 0;
+
+
+operator_modules = py_modules_from_directory(operator_dir=operator_root_dir)
+print(operator_modules)
+
+
+print(dir(operator_modules[0]))
+
+module_array = py_functions_from_modules(operator_modules)
+print(module_array)
+
+print('\n')
+
+print(type(read_module_list()))
+
+#list of lists: each sub-array is formatted as:
+#[module_name, function_name, function_input_count]
+print(module_array[0])
+#number of functions
+print(module_array[1])
+#sum of inputs for all functions all modules in the modules_list
+print(module_array[2])
+
+print(parse_tensor('[1 2 1 4]'))

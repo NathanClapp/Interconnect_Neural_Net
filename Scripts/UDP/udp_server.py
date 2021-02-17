@@ -18,4 +18,8 @@ def udp_server(host='', port=1234, byte_buffer=1024):
             print(data)
             print(type(data))
             #parse_tensor
-            #run_container_modules
+            #start process for listening on mkfifo
+            #send to files (1 function, make run files beforehand)
+                #takes parsed tensor and location for run files
+            
+            #end 

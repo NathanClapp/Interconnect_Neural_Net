@@ -52,15 +52,26 @@ def py_functions_from_modules(modules_list, ignore_substring='__'):
             #sum of inputs for all functions all modules in the modules_list
             function_cumulative_argc]
 
-def write_module_list(module_array, filename='module_list.txt'):
+#return a list of all the unique modules in the directory
+def get_unique_modules(function_argc_list):
+    unique_modules = []
+    for i in function_argc_list:
+        for j in unique_modules:
+            if i != j:
+                unique_modules.append(i)
+            else:
+                continue
+    return unique_modules
+
+def write_module_list(module_array, filename='/home/nathan/Documents/Code/Interconnect_Neural_Net/module_list.txt'):
     with open(filename, 'w') as file:
         json.dump(module_array, file)
 
-def read_module_list(filename='module_list.txt'):
+def read_module_list(filename='/home/nathan/Documents/Code/Interconnect_Neural_Net/module_list.txt'):
     with open(filename, 'r') as file:
         return json.load(file)
 
-#returns python list of ints
+#returns python list of ints, from tf tensor encoded as string
 def parse_tensor(decoded_tensor):
     #remove brackets and convert to list
     return [int(i) for i in decoded_tensor.replace('[','').replace(']','').split()]
@@ -83,21 +94,81 @@ def parse_tensor(decoded_tensor):
 #    return output_list
 # }
 
+#Do: include typecasting between sys.argv and layer function - modify module array to include a list of dtypes
+    #workarea: py_functions_from_modules
+
+comment_string = '''
+Typecasting thought:
+-leave custom types alone for now - just work with ints for convenience
+arg1 = int(sys.argv[1])
+etc.
+
+print(function(arg1,arg2,arg3,))
+
+
+working module format - update template:
+import os, sys
+sys.path.append('/home/nathan/Documents/Code/Interconnect_Neural_Net/Scripts/Layer_Programs/Operators')
+
+from boolean_py import and_bool
+
+with open('fifosomething.txt', 'w') as fifo:
+    print(and_bool(int(sys.argv[1]),int(sys.argv[2]),), file=fifo)
+
+
+'''
+
+#write a string reading in as many argv values as the relevant function's argc
+def argc_to_argv(argc):
+    #argv[0] is the file itself
+    argv_index = 1
+    base_string = 'int(sys.argv[{}]),'
+    return_string = ''
+    while argv_index <= argc:
+        return_string += base_string.format(argv_index)
+        argv_index += 1
+    return return_string
+
+
+#Do: mark off decoded tensor values as function inputs are filled (keep 1-1 map)
+    #right now the file writer assumes that there are exactly as many elements in the input tensor as there are parallel run files (same as function count)
+#Do: make a function to assign FIFO files (see: man mkfifo)
+
 #take a list of lists such as: [module_name, function_name, function_input_count]
-#mark off decoded tensor values as function inputs are filled (keep 1-1 map)
-#run as many parallel processes as there are functions
-def write_runner_files(modules_list, filename='parallel_runfile{}.py'):
-    #may be better to just run multiple udp servers after parsing tensor client-side
-    if modules_list[2] == len(decoded_tensor):
-        for i in range(len(modules_list[1])):
-            with open(filename.format(i)) as file:
-                file.write('import os\n')
-                file.write('')
+#write files for each function, per the template file
+def write_runner_files(modules_list,
+#    decoded_tensor,
+    operator_root_dir = '\'/home/nathan/Documents/Code/Interconnect_Neural_Net/Scripts/Layer_Programs/Operators\'', #file writing removes 1 layer of quotes & 1 layer is needed for the parallel files
+    parallel_file_directory='/home/nathan/Documents/Code/Interconnect_Neural_Net/Scripts/Layer_Programs/Parallel_Files/',
+    in_filename= 'template.txt',
+    out_filename='parallel_runfile_{}.py'):
 
+    keywords_dict = {'operator_root_dir':'','module_name':'', 'function':'', 'argv':''}
 
+    #remove this equality as a requirement
+#    if modules_list[1] == len(decoded_tensor):
+    #read in template py file
+    with open(parallel_file_directory + in_filename, 'r') as in_file:
+        in_file = in_file.readlines()
+    #iterate through all functions
+    for i in range(modules_list[1]):
+        #map module/function/argc values from modules_list to dict
+        #make this less manual/compatible with more key/value pairs
+        keywords_dict['operator_root_dir'] = operator_root_dir
+        keywords_dict['module_name'] = modules_list[0][i][0]
+        keywords_dict['function'] = modules_list[0][i][1]
+        keywords_dict['argv'] = argc_to_argv(modules_list[0][i][2])
+        print(keywords_dict)
 
-
-#    return 0;
+        #writing run files - assign function name to each runfile
+        with open(parallel_file_directory + out_filename.format(keywords_dict['function']), 'w') as out_file:
+            for line in in_file:
+                for keyword in keywords_dict:
+                    if keyword in line:
+                        #replace generic keywords with strings from modules_list
+                        line = line.replace(keyword, keywords_dict[keyword])
+                out_file.write(line)
+    return True
 
 
 operator_modules = py_modules_from_directory(operator_dir=operator_root_dir)
@@ -122,3 +193,8 @@ print(module_array[1])
 print(module_array[2])
 
 print(parse_tensor('[1 2 1 4]'))
+
+print(argc_to_argv(5))
+
+write_runner_files(modules_list=module_array,)
+                    #decoded_tensor=[1,2,3,4,5,6])

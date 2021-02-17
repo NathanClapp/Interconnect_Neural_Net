@@ -1,0 +1,7 @@
+import os, sys
+sys.path.append(operator_root_dir)
+
+from module_name import function
+
+with open('fifosomething.txt', 'w') as fifo:
+    print(function(argv), file=fifo)

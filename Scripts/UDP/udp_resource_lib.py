@@ -97,7 +97,7 @@ def parse_tensor(decoded_tensor):
 #Do: include typecasting between sys.argv and layer function - modify module array to include a list of dtypes
     #workarea: py_functions_from_modules
 
-comment_string = '''
+'''
 Typecasting thought:
 -leave custom types alone for now - just work with ints for convenience
 arg1 = int(sys.argv[1])

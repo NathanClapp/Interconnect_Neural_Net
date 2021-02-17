@@ -1,0 +1,1 @@
+[[["boolean_py", "and_bool", 2], ["boolean_py", "nand_bool", 2], ["boolean_py", "nor_bool", 2], ["boolean_py", "not_bool", 1], ["boolean_py", "or_bool", 2], ["boolean_py", "xor_bool", 2]], 6, 11]

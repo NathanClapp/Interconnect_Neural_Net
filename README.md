@@ -27,6 +27,9 @@ Test ability of the network to interconnect arbitrarily complex modules (e.g. pa
 - Need for 'pass' operator in every layer? (removes need for layer 1 to be densely connected to layer 6, but would need an extra container ).
 - Storage modules? (docker volumes, bind mounts as a last resort)
 - Project may be incompatible with graph compilation - requires eager execution at present due to UDP client/possibly communication with Docker.
+- Dependencies:
+    - Python 3.8.5 64-bit
+    - 
 
 ### Do List
 ##### Small/Fast Checkpoints

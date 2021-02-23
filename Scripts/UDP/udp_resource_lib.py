@@ -1,7 +1,7 @@
 #supporting functions for udp server
 
 #normal python modules
-import subprocess, multiprocessing, sys, os, json, types
+import subprocess, multiprocessing, sys, os, json
 from inspect import signature, getmembers
 
 #get this path automatically later
@@ -98,13 +98,7 @@ def parse_tensor(decoded_tensor):
     #workarea: py_functions_from_modules
 
 '''
-Typecasting thought:
--leave custom types alone for now - just work with ints for convenience
-arg1 = int(sys.argv[1])
-etc.
-
-print(function(arg1,arg2,arg3,))
-
+-Do: custom type casting later (get type from function signature, include in module array)
 
 working module format - update template:
 import os, sys
@@ -118,10 +112,18 @@ with open('fifosomething.txt', 'w') as fifo:
 
 '''
 
+#make argv strings to accept fifos
+def fifo_argv():
+    base_string = 'sys.argv[{}]'
+    return base_string.format(1)
+
 #write a string reading in as many argv values as the relevant function's argc
-def argc_to_argv(argc):
-    #argv[0] is the file itself
-    argv_index = 1
+
+def function_argv(argc):
+    #argv[0] is the file being called - ignore 1st argument
+    #shift up argc to allow fifo input
+    argv_index = 2
+    argc += 1
     base_string = 'int(sys.argv[{}]),'
     return_string = ''
     while argv_index <= argc:
@@ -129,6 +131,12 @@ def argc_to_argv(argc):
         argv_index += 1
     return return_string
 
+def make_fifo(function_name, parallel_file_directory='/home/nathan/Documents/Code/Interconnect_Neural_Net/Scripts/Layer_Programs/Parallel_Files/'):
+    fifo_name = function_name + '_fifo'
+    fifo_folder = 'fifos/'
+    os.popen('cd ' + parallel_file_directory + fifo_folder + ' && '
+                    'mkfifo ' + fifo_name)
+    return fifo_name
 
 #Do: mark off decoded tensor values as function inputs are filled (keep 1-1 map)
     #right now the file writer assumes that there are exactly as many elements in the input tensor as there are parallel run files (same as function count)
@@ -137,27 +145,31 @@ def argc_to_argv(argc):
 #take a list of lists such as: [module_name, function_name, function_input_count]
 #write files for each function, per the template file
 def write_runner_files(modules_list,
-#    decoded_tensor,
     operator_root_dir = '\'/home/nathan/Documents/Code/Interconnect_Neural_Net/Scripts/Layer_Programs/Operators\'', #file writing removes 1 layer of quotes & 1 layer is needed for the parallel files
     parallel_file_directory='/home/nathan/Documents/Code/Interconnect_Neural_Net/Scripts/Layer_Programs/Parallel_Files/',
     in_filename= 'template.txt',
     out_filename='parallel_runfile_{}.py'):
 
-    keywords_dict = {'operator_root_dir':'','module_name':'', 'function':'', 'argv':''}
+    #function argv and file argv are mutually exclusive
+    keywords_dict = {'operator_root_dir':'','module_name':'', 'function':'', 'argv':'', 'out_fifo':''}
 
-    #remove this equality as a requirement
-#    if modules_list[1] == len(decoded_tensor):
     #read in template py file
     with open(parallel_file_directory + in_filename, 'r') as in_file:
         in_file = in_file.readlines()
     #iterate through all functions
+    print(modules_list[1])
     for i in range(modules_list[1]):
         #map module/function/argc values from modules_list to dict
         #make this less manual/compatible with more key/value pairs
         keywords_dict['operator_root_dir'] = operator_root_dir
         keywords_dict['module_name'] = modules_list[0][i][0]
         keywords_dict['function'] = modules_list[0][i][1]
-        keywords_dict['argv'] = argc_to_argv(modules_list[0][i][2])
+        #get argc
+        argument_count = modules_list[0][i][2]
+        keywords_dict['argv'] = function_argv(argument_count)
+        #extra arguments for input and output files
+        keywords_dict['out_fifo'] = fifo_argv()
+
         print(keywords_dict)
 
         #writing run files - assign function name to each runfile
@@ -168,7 +180,18 @@ def write_runner_files(modules_list,
                         #replace generic keywords with strings from modules_list
                         line = line.replace(keyword, keywords_dict[keyword])
                 out_file.write(line)
+        
+        #writing fifos
+        fifo_name = make_fifo(function_name=keywords_dict['function'])
+        print(fifo_name)
+
     return True
+
+#take created run files and the parsed tensor
+#generate fifos for each file (unique ids)
+#
+#def parallel_run(parallel_file_directory='/home/nathan/Documents/Code/Interconnect_Neural_Net/Scripts/Layer_Programs/Parallel_Files/'):
+
 
 
 operator_modules = py_modules_from_directory(operator_dir=operator_root_dir)
@@ -194,7 +217,7 @@ print(module_array[2])
 
 print(parse_tensor('[1 2 1 4]'))
 
-print(argc_to_argv(5))
+print(function_argv(5))
 
 write_runner_files(modules_list=module_array,)
                     #decoded_tensor=[1,2,3,4,5,6])

@@ -29,7 +29,13 @@ Test ability of the network to interconnect arbitrarily complex modules (e.g. pa
 - Project may be incompatible with graph compilation - requires eager execution at present due to UDP client/possibly communication with Docker.
 - Dependencies:
     - Python 3.8.5 64-bit
-    - 
+      - socket, os, sys, json, inspect
+    - Tensorflow 2.3.1
+    - GNU programs:
+      - mkfifo, parallel
+    - Docker
+      - tbd
+    - Kubernetes?
 
 ### Do List
 ##### Small/Fast Checkpoints

@@ -1,7 +1,7 @@
 #supporting functions for udp server
 
 #normal python modules
-import subprocess, multiprocessing, sys, os, json
+import sys, os, json
 from inspect import signature, getmembers
 
 #get this path automatically later
@@ -94,23 +94,11 @@ def parse_tensor(decoded_tensor):
 #    return output_list
 # }
 
+
 #Do: include typecasting between sys.argv and layer function - modify module array to include a list of dtypes
     #workarea: py_functions_from_modules
+#-Do: custom type casting later (get type from function signature, include in module array)
 
-'''
--Do: custom type casting later (get type from function signature, include in module array)
-
-working module format - update template:
-import os, sys
-sys.path.append('/home/nathan/Documents/Code/Interconnect_Neural_Net/Scripts/Layer_Programs/Operators')
-
-from boolean_py import and_bool
-
-with open('fifosomething.txt', 'w') as fifo:
-    print(and_bool(int(sys.argv[1]),int(sys.argv[2]),), file=fifo)
-
-
-'''
 
 #make argv strings to accept fifos
 def fifo_argv():
@@ -187,9 +175,13 @@ def write_runner_files(modules_list,
 
     return True
 
-#take created run files and the parsed tensor
-#generate fifos for each file (unique ids)
-#
+#start before 
+#start read process
+#if read process exits, return data to layer
+#def read_fifo
+
+#take created run files, fifos, and the parsed tensor
+#run them in parallel
 #def parallel_run(parallel_file_directory='/home/nathan/Documents/Code/Interconnect_Neural_Net/Scripts/Layer_Programs/Parallel_Files/'):
 
 
